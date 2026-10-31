@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keuangan Kita | Dashboard Keuangan</title>
+    <!-- Tailwind CSS v4 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-teal-500 selection:text-slate-950">
+
+    <!-- Header / Navbar Modern -->
+    <header class="bg-slate-900/80 backdrop-blur-md text-white sticky top-0 z-40 border-b border-slate-800/80">
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <!-- Brand Logo -->
+            <h1 class="text-2xl font-extrabold tracking-tight">
+                <a href="#" class="flex items-center gap-2 group">
+                    <span class="p-2 bg-teal-500/10 text-teal-400 rounded-xl group-hover:bg-teal-500 group-hover:text-slate-950 transition-all duration-300">
+                      📊
+                    </span>
+                    <span class="bg-gradient-to-r from-white via-slate-200 to-teal-400 bg-clip-text text-transparent">
+                      Keuangan<span class="text-teal-400 font-bold">Kita</span>
+                    </span>
+                </a>
+            </h1>
+
+            <!-- Navigasi Desktop -->
+            <nav class="hidden sm:flex items-center gap-2 font-medium text-sm text-slate-300">
+                <button onclick="showPage('transaksi')" id="nav-transaksi" class="nav-btn px-4 py-2 rounded-xl bg-teal-500 text-slate-950 font-semibold transition-all">
+                    📝 Arus Kas
+                </button>
+                <button onclick="showPage('modal')" id="nav-modal" class="nav-btn px-4 py-2 rounded-xl hover:bg-slate-800 transition-all">
+                    🧮 Hitung Modal
+                </button>
+                <button onclick="showPage('utang')" id="nav-utang" class="nav-btn px-4 py-2 rounded-xl hover:bg-slate-800 transition-all">
+                    🤝 Piutang
+                </button>
+                <button onclick="showPage('grafik')" id="nav-grafik" class="nav-btn px-4 py-2 rounded-xl hover:bg-slate-800 transition-all">
+                    📊 Grafik & Analisis
+                </button>
+            </nav>
+
+            <!-- Tombol Mobile Hamburger -->
+            <div class="sm:hidden">
+                <button id="mobile-open-button" onclick="toggleMenu()" class="text-2xl p-2 text-slate-300 hover:text-white focus:outline-none cursor-pointer">
+                    &#9776;
+                </button>
+            </div>
+        </section>
+
+        <!-- Sidebar / Drawer Mobile -->
+        <div id="mobile-menu" class="hidden sm:hidden bg-slate-900 border-b border-slate-800 px-6 py-4 space-y-3 font-medium text-slate-300">
+            <button onclick="showPage('transaksi')" class="block w-full text-left py-2 hover:text-teal-400">📝 Arus Kas</button>
+            <button onclick="showPage('modal')" class="block w-full text-left py-2 hover:text-teal-400">🧮 Hitung Modal Awal</button>
+            <button onclick="showPage('utang')" class="block w-full text-left py-2 hover:text-teal-400">🤝 Piutang</button>
+            <button onclick="showPage('grafik')" class="block w-full text-left py-2 hover:text-teal-400">📊 Grafik & Analisis</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        
+        <!-- Halaman 1: Transaksi Arus Kas -->
+        <section id="transaksi" class="content-page space-y-6">
+            <div class="p-6 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <h2 class="text-xl font-bold tracking-tight">Catat Arus Kas Bulan Ini</h2>
+                    <p class="text-xs text-slate-400 mt-1">Masukkan angka pemasukan dan alokasi anggaran bulanan Anda.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Pemasukan Total (Rp)</label>
+                        <input type="text" inputmode="numeric" id="pemasukan" oninput="formatRupiah(this)" placeholder="Contoh: 7.000.000" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-teal-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Kebutuhan Pokok (Sewa, Makan, Tagihan) (Rp)</label>
+                        <input type="text" inputmode="numeric" id="kebutuhan" oninput="formatRupiah(this)" placeholder="Contoh: 3.000.000" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-teal-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Gaya Hidup (Nongkrong, Hobi, Hiburan) (Rp)</label>
+                        <input type="text" inputmode="numeric" id="gayaHidup" oninput="formatRupiah(this)" placeholder="Contoh: 2.000.000" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-teal-500 transition-colors">
+                    </div>
+                </div>
+
+                <button onclick="simpanTransaksi()" class="w-full py-3.5 rounded-xl bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition-all shadow-lg shadow-teal-500/20 cursor-pointer">
+                    Simpan & Hitung Evaluasi
+                </button>
+
+                <!-- Ringkasan Hasil -->
+                <div class="p-6 rounded-xl bg-slate-950 border border-slate-800/80 space-y-3">
+                    <p class="text-xs text-slate-400 font-medium">Estimasi Saldo Tersisa</p>
+                    <h3 id="hasil-sisa" class="text-3xl font-extrabold tracking-tight">Rp 0</h3>
+                    
+                    <div id="peringatan" class="hidden p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium leading-relaxed">
+                        ⚠️ <strong>PERINGATAN KEUANGAN:</strong> Pengeluaran gaya hidup Anda melebihi batas aman (30% dari total pemasukan) atau saldo Anda minus. Rem pengeluaran tidak mendesak!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Halaman BARU: Kalkulator Modal Awal & BEP -->
+        <section id="modal" class="content-page hidden space-y-6">
+            <div class="p-6 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <h2 class="text-xl font-bold tracking-tight">Kalkulator Modal Awal & ROI</h2>
+                    <p class="text-xs text-slate-400 mt-1">Hitung waktu pengembalian modal (Break-Even Point) proyek atau bisnis Anda.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Total Modal Awal Investasi (Rp)</label>
+                        <input type="text" inputmode="numeric" id="modalAwal" oninput="formatRupiah(this)" placeholder="Contoh: 50.000.000" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-teal-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Estimasi Pendapatan Kotor Bulanan (Rp)</label>
+                        <input type="text" inputmode="numeric" id="pendapatanModal" oninput="formatRupiah(this)" placeholder="Contoh: 15.000.000" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-teal-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Estimasi Biaya Operasional Bulanan (Rp)</label>
+                        <input type="text" inputmode="numeric" id="operasionalModal" oninput="formatRupiah(this)" placeholder="Contoh: 8.000.000" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-teal-500 transition-colors">
+                    </div>
+                </div>
+
+                <button onclick="hitungsSimpanModal()" class="w-full py-3.5 rounded-xl bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition-all shadow-lg shadow-teal-500/20 cursor-pointer">
+                    Hitung Estimasi Balik Modal
+                </button>
+
+                <!-- Hasil Perhitungan Modal Awal -->
+                <div class="p-6 rounded-xl bg-slate-950 border border-slate-800/80 space-y-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-teal-400 border-b border-slate-800 pb-2">Hasil Analisis Investasi</h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+                            <p class="text-xs text-slate-400 font-medium">Keuntungan Bersih / Bulan</p>
+                            <h4 id="hasil-profit-modal" class="text-xl font-bold mt-1 text-emerald-400">Rp 0</h4>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+                            <p class="text-xs text-slate-400 font-medium">Estimasi Waktu Balik Modal</p>
+                            <h4 id="hasil-bep-modal" class="text-xl font-bold mt-1 text-teal-400">0 Bulan</h4>
+                        </div>
+                    </div>
+
+                    <div id="status-modal-info" class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                        Masukkan data modal awal di atas untuk melihat analisis pengembalian investasi.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Halaman 2: Utang / Piutang -->
+        <section id="utang" class="content-page hidden space-y-6">
+            <div class="p-6 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <h2 class="text-xl font-bold tracking-tight">Catat Peminjam Uang (Piutang)</h2>
+                    <p class="text-xs text-slate-400 mt-1">Pantau siapa saja yang memiliki pinjaman kepada Anda.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Nama Peminjam</label>
+                        <input type="text" id="namaPenghutang" placeholder="Contoh: Budi" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-teal-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Nominal Pinjaman (Rp)</label>
+                        <input type="text" inputmode="numeric" id="nominalUtang" oninput="formatRupiah(this)" placeholder="Contoh: 500.000" class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-teal-500 transition-colors">
+                    </div>
+                </div>
+
+                <button onclick="tambahUtang()" class="w-full py-3.5 rounded-xl bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition-all shadow-lg shadow-teal-500/20 cursor-pointer">
+                    + Tambahkan Catatan Piutang
+                </button>
+            </div>
+
+            <div class="p-6 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
+                <h3 class="text-lg font-bold">Daftar Piutang Aktif</h3>
+                <div id="daftarUtang" class="space-y-3">
+                    <p class="text-xs text-slate-500">Belum ada catatan piutang aktif.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Halaman 3: Grafik Bulanan -->
+        <section id="grafik" class="content-page hidden space-y-6">
+            <div class="p-6 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <h2 class="text-xl font-bold tracking-tight">Proporsi Pengeluaran Bulanan</h2>
+                    <p class="text-xs text-slate-400 mt-1">Visualisasi alokasi pemasukan berdasarkan data transaksi yang tersimpan.</p>
+                </div>
+
+                <div class="w-full max-w-md mx-auto py-4">
+                    <canvas id="myChart"></canvas>
+                </div>
+
+                <p class="text-xs text-center text-slate-500">
+                    *Grafik diperbarui secara otomatis berdasarkan data arus kas dan daftar piutang Anda.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Logic JavaScript -->
+    <script>
+        // State Data
+        let dataKeuangan = JSON.parse(localStorage.getItem('keuanganPro')) || {
+            pemasukan: 0, 
+            kebutuhan: 0, 
+            gayaHidup: 0,
+            modalAwal: 0,
+            pendapatanModal: 0,
+            operasionalModal: 0,
+            daftarUtang: []
+        };
+        let myChartInstance = null;
+
+        // Auto Format Input Rupiah
+        function formatRupiah(input) {
+            let value = input.value.replace(/[^0-9]/g, '');
+            if (value) {
+                input.value = parseInt(value, 10).toLocaleString('id-ID');
+            } else {
+                input.value = '';
+            }
+        }
+
+        function parseRupiah(id) {
+            let val = document.getElementById(id).value.replace(/[^0-9]/g, '');
+            return val ? parseInt(val, 10) : 0;
+        }
+
+        function tampilkanFormatKeInput(id, nilai) {
+            if (nilai > 0) {
+                document.getElementById(id).value = nilai.toLocaleString('id-ID');
+            } else {
+                document.getElementById(id).value = '';
+            }
+        }
+
+        // Inisialisasi awal
+        window.onload = () => {
+            tampilkanFormatKeInput('pemasukan', dataKeuangan.pemasukan);
+            tampilkanFormatKeInput('kebutuhan', dataKeuangan.kebutuhan);
+            tampilkanFormatKeInput('gayaHidup', dataKeuangan.gayaHidup);
+            
+            tampilkanFormatKeInput('modalAwal', dataKeuangan.modalAwal || 0);
+            tampilkanFormatKeInput('pendapatanModal', dataKeuangan.pendapatanModal || 0);
+            tampilkanFormatKeInput('operasionalModal', dataKeuangan.operasionalModal || 0);
+            
+            renderUtang();
+            cekPeringatan();
+            kalkulasiModal();
+        };
+
+        function toggleMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.content-page').forEach(el => el.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-teal-500', 'text-slate-950', 'font-semibold');
+                btn.classList.add('hover:bg-slate-800');
+            });
+
+            const activeBtn = document.getElementById(`nav-${pageId}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-teal-500', 'text-slate-950', 'font-semibold');
+                activeBtn.classList.remove('hover:bg-slate-800');
+            }
+
+            document.getElementById('mobile-menu').classList.add('hidden');
+
+            if(pageId === 'grafik') { 
+                renderChart(); 
+            }
+        }
+
+        function simpanTransaksi() {
+            dataKeuangan.pemasukan = parseRupiah('pemasukan');
+            dataKeuangan.kebutuhan = parseRupiah('kebutuhan');
+            dataKeuangan.gayaHidup = parseRupiah('gayaHidup');
+            
+            simpanData();
+            cekPeringatan();
+            alert("Data transaksi berhasil disimpan!");
+        }
+
+        function hitungsSimpanModal() {
+            dataKeuangan.modalAwal = parseRupiah('modalAwal');
+            dataKeuangan.pendapatanModal = parseRupiah('pendapatanModal');
+            dataKeuangan.operasionalModal = parseRupiah('operasionalModal');
+            
+            simpanData();
+            kalkulasiModal();
+            alert("Kalkulasi modal awal berhasil diperbarui!");
+        }
+
+        function kalkulasiModal() {
+            let modal = dataKeuangan.modalAwal || 0;
+            let omset = dataKeuangan.pendapatanModal || 0;
+            let opex = dataKeuangan.operasionalModal || 0;
+
+            let netProfit = omset - opex;
+            let profitEl = document.getElementById('hasil-profit-modal');
+            let bepEl = document.getElementById('hasil-bep-modal');
+            let infoEl = document.getElementById('status-modal-info');
+
+            profitEl.innerText = `Rp ${netProfit.toLocaleString('id-ID')}`;
+
+            if (netProfit <= 0) {
+                profitEl.className = 'text-xl font-bold mt-1 text-rose-400';
+                bepEl.innerText = 'Tidak Terhingga';
+                bepEl.className = 'text-xl font-bold mt-1 text-rose-400';
+                infoEl.innerHTML = '⚠️ <strong>Peringatan Bisnis:</strong> Operasional bulanan lebih besar atau sama dengan pendapatan. Bisnis mengalami kerugian, modal tidak akan kembali jika tidak ada efisiensi.';
+            } else {
+                profitEl.className = 'text-xl font-bold mt-1 text-emerald-400';
+                let bulanBEP = (modal / netProfit).toFixed(1);
+                bepEl.innerText = `± ${bulanBEP} Bulan`;
+                bepEl.className = 'text-xl font-bold mt-1 text-teal-400';
+                infoEl.innerHTML = `💡 <strong>Analisis Proyeksi:</strong> Dengan estimasi net profit <strong>Rp ${netProfit.toLocaleString('id-ID')}/bulan</strong>, investasi modal awal sebesar <strong>Rp ${modal.toLocaleString('id-ID')}</strong> diperkirakan akan balik modal penuh dalam <strong>${bulanBEP} bulan</strong>.`;
+            }
+        }
+
+        function cekPeringatan() {
+            let totalUtang = dataKeuangan.daftarUtang.reduce((sum, item) => sum + item.nominal, 0);
+            let sisa = dataKeuangan.pemasukan - (dataKeuangan.kebutuhan + dataKeuangan.gayaHidup + totalUtang);
+            
+            let hasilText = document.getElementById('hasil-sisa');
+            hasilText.innerText = `Rp ${sisa.toLocaleString('id-ID')}`;
+            
+            if (sisa < 0) {
+                hasilText.className = 'text-3xl font-extrabold tracking-tight text-rose-400';
+            } else {
+                hasilText.className = 'text-3xl font-extrabold tracking-tight text-emerald-400';
+            }
+
+            let peringatan = document.getElementById('peringatan');
+            if ((dataKeuangan.pemasukan > 0 && dataKeuangan.gayaHidup > (0.3 * dataKeuangan.pemasukan)) || sisa < 0) {
+                peringatan.classList.remove('hidden');
+            } else {
+                peringatan.classList.add('hidden');
+            }
+        }
+
+        function tambahUtang() {
+            let nama = document.getElementById('namaPenghutang').value.trim();
+            let nominal = parseRupiah('nominalUtang');
+            
+            if(!nama || nominal <= 0) return alert("Masukkan nama peminjam dan nominal angka yang valid!");
+
+            dataKeuangan.daftarUtang.push({ id: Date.now(), nama, nominal });
+            document.getElementById('namaPenghutang').value = '';
+            document.getElementById('nominalUtang').value = '';
+            
+            simpanData();
+            renderUtang();
+            cekPeringatan();
+        }
+
+        function lunasUtang(id) {
+            dataKeuangan.daftarUtang = dataKeuangan.daftarUtang.filter(u => u.id !== id);
+            simpanData();
+            renderUtang();
+            cekPeringatan();
+        }
+
+        function renderUtang() {
+            let container = document.getElementById('daftarUtang');
+            container.innerHTML = '';
+            
+            if(dataKeuangan.daftarUtang.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500">Belum ada catatan piutang aktif.</p>';
+                return;
+            }
+
+            dataKeuangan.daftarUtang.forEach(u => {
+                let div = document.createElement('div');
+                div.className = 'p-4 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center';
+                div.innerHTML = `
+                    <div>
+                        <p class="font-semibold text-sm">${u.nama}</p>
+                        <p class="text-xs text-teal-400 font-medium mt-0.5">Rp ${u.nominal.toLocaleString('id-ID')}</p>
+                    </div>
+                    <button onclick="lunasUtang(${u.id})" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold hover:bg-emerald-500 hover:text-slate-950 transition-all cursor-pointer">
+                        Tandai Lunas ✔️
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderChart() {
+            let ctx = document.getElementById('myChart').getContext('2d');
+            let totalUtang = dataKeuangan.daftarUtang.reduce((sum, item) => sum + item.nominal, 0);
+            let sisaTersimpan = dataKeuangan.pemasukan - (dataKeuangan.kebutuhan + dataKeuangan.gayaHidup + totalUtang);
+            let sisa = sisaTersimpan > 0 ? sisaTersimpan : 0; 
+
+            let chartData = {
+                labels: ['Kebutuhan Pokok', 'Gaya Hidup', 'Piutang', 'Sisa/Ditabung'],
+                datasets: [{
+                    data: [dataKeuangan.kebutuhan, dataKeuangan.gayaHidup, totalUtang, sisa],
+                    backgroundColor: ['#14b8a6', '#f43f5e', '#f59e0b', '#10b981'],
+                    borderWidth: 0
+                }]
+            };
+
+            if (myChartInstance) { 
+                myChartInstance.destroy(); 
+            } 
+
+            myChartInstance = new Chart(ctx, {
+                type: 'doughnut', 
+                data: chartData,
+                options: { 
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: 'Inter', size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function simpanData() {
+            localStorage.setItem('keuanganPro', JSON.stringify(dataKeuangan));
+        }
+    </script>
+</body>
+</html>
